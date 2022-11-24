@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 minDrwNo = 1  # 시작 회차
-maxDrwNo = 104  # 종료 회차
+maxDrwNo = 1042  # 종료 회차
 drwtNo1 = []  # 1등 첫번째 번호 리스트
 drwtNo2 = []  # 1등 두번째 번호 리스트
 drwtNo3 = []  # 1등 세번째 번호 리스트
@@ -56,6 +56,26 @@ def lotto_winnings(last_lotto_winning_num, guess_lotto_num):
     else:
         return "미당첨"
 
+
+# 빈도수 낮은 순으로 15개, 15개, 15개로 나눈후 제일 빈도수 낮은 15개에는 60%, 그다음 15개는 30%, 마지막 15개는 10% 의 가중치를 주어 7개의 난수를 추출
+def get_lotto_numbers():
+    guess_lotto_numbers = []
+    while len(guess_lotto_numbers) < 7:
+        num = random.choices(
+            [x for x in frequency_descending_order],
+            weights=[
+                6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150,
+                6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150,
+                3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150,
+                3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150,
+                1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150,
+                1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150
+            ],
+            k=1)
+        if num not in guess_lotto_numbers:
+            guess_lotto_numbers.append(num[0])
+    return guess_lotto_numbers
+
 lotto_count = get_lotto_number_history(minDrwNo, maxDrwNo)
 
 # 빈도수 내림차순
@@ -65,26 +85,19 @@ frequency_descending_order = sorted(lotto_count, key=lambda x: lotto_count[x], r
 for i in range(1, 46):
     print(str(i) + " 번 확률 : " + str(lotto_count[i] / maxDrwNo))
 
-# 빈도수 낮은 순으로 15개, 15개, 15개로 나눈후 제일 빈도수 낮은 15개에는 60%, 그다음 15개는 30%, 마지막 15개는 10% 의 가중치를 주어 7개의 난수를 추출
-guess_lotto_numbers = []
-while len(guess_lotto_numbers) < 7:
-    num = random.choices(
-        [x for x in frequency_descending_order],
-        weights=[
-            6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150, 6 / 150,
-            6 / 150, 6 / 150, 6 / 150,
-            3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150, 3 / 150,
-            3 / 150, 3 / 150, 3 / 150,
-            1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150, 1 / 150,
-            1 / 150, 1 / 150, 1 / 150
-        ],
-        k=1)
-    if num not in guess_lotto_numbers:
-        guess_lotto_numbers.append(num[0])
-
 # 마지막 회차 당첨 번호
 last_lotto_num = [drwtNo1[-1], drwtNo2[-1], drwtNo3[-1], drwtNo4[-1], drwtNo5[-1], drwtNo6[-1], bnusNo[-1]]
 
 print(f"{maxDrwNo}회차 로또 당첨 번호 :", " ".join(map(str, sorted(last_lotto_num[:6]))), "+", last_lotto_num[6])
-print(f"{maxDrwNo}회차 로또 추측 번호 :", " ".join(map(str, sorted(guess_lotto_numbers[:6]))), "+", guess_lotto_numbers[6])
-print(lotto_winnings(last_lotto_num, guess_lotto_numbers))
+print(f"{maxDrwNo}회차 로또 추측 번호 :", " ".join(map(str, sorted(get_lotto_numbers()[:6]))), "+", get_lotto_numbers()[6])
+print(lotto_winnings(last_lotto_num, get_lotto_numbers()))
+
+test_dict = {
+    "1등":0, "2등":0, "3등":0, "4등":0, "5등":0, "미당첨":0
+}
+
+# 테스트 코드
+for x in range(10000):
+    test_dict[lotto_winnings(last_lotto_num, get_lotto_numbers())] += 1
+
+print(test_dict)
